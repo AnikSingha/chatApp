@@ -1,6 +1,10 @@
+import Login from "./routes/login"
+
 function App() {
   return(
-    <h1>Hello</h1>
+    <>
+    <Login/>
+    </>
   )
 }
 
