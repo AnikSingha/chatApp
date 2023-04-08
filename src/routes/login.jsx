@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import CenterBox from '../components/centerBox';
+import LoginBox from '../components/loginBox';
 
 function Login() {
   return (
@@ -11,7 +11,7 @@ function Login() {
         height: '100vh'
       }}
     >
-      <CenterBox />
+      <LoginBox />
     </Box>
   );
 }
