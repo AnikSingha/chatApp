@@ -1,8 +1,17 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faGoogle, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from 'reactfire';
+import { useState, useEffect } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 function LoginBox() {
+  
+  const auth = useAuth()
+  const [username, setUsername] = useState()
+  const [password, setPassword] = useState()
+
   return (
     <Box
       sx={{
@@ -26,6 +35,7 @@ function LoginBox() {
           variant="filled"
           margin="normal"
           fullWidth
+          onChange={(e) => setUsername(e.target.value)}
           InputLabelProps={{
             style: { color: '#fff' },
           }}
@@ -40,6 +50,7 @@ function LoginBox() {
           margin="normal"
           fullWidth
           type="password"
+          onChange={(e) => setPassword(e.target.value)}
           InputLabelProps={{
             style: { color: '#fff' },
           }}
@@ -51,7 +62,7 @@ function LoginBox() {
           Submit
         </Button>
         <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
-          Don't have an account? <a href="#" style={{ color: '#ADD8E6' }}>Sign Up</a>
+          Don't have an account? <a onClick={() => {Navigate('/register')}} style={{ color: '#ADD8E6', cursor: 'pointer' }}>Sign Up</a>
         </Typography>
         <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
           Or sign in with
