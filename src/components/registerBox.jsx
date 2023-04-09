@@ -1,12 +1,9 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faGoogle, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'reactfire';
 import { useState, useEffect } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 
-function LoginBox() {
+function RegisterBox() {
   
   const auth = useAuth()
   const [username, setUsername] = useState()
@@ -27,7 +24,7 @@ function LoginBox() {
       }}
     >
       <Typography variant="h4" gutterBottom>
-        Log In
+        Sign Up
       </Typography>
       <form>
         <TextField
@@ -63,19 +60,11 @@ function LoginBox() {
           Submit
         </Button>
         <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
-          Don't have an account? <a onClick={() => {navigate('/register')}} style={{ color: '#ADD8E6', cursor: 'pointer' }}>Sign Up</a>
-        </Typography>
-        <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
-          Or sign in with
-          <Box component="span" sx={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
-            <FontAwesomeIcon icon={faGoogle} style={{ color: '#fff', fontSize: '2rem', margin: '0 5px' }} />
-            <FontAwesomeIcon icon={faFacebook} style={{ color: '#fff', fontSize: '2rem', margin: '0 5px' }} />
-            <FontAwesomeIcon icon={faTwitter} style={{ color: '#fff', fontSize: '2rem', margin: '0 5px' }} />
-          </Box>
+          Already have an Account? <a onClick={() => {navigate('/login')}} style={{ color: '#ADD8E6', cursor: 'pointer' }}>Log in</a>
         </Typography>
       </form>
     </Box>
   );
 }
 
-export default LoginBox;
+export default RegisterBox;
