@@ -1,13 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import { useFirestore, useAuth } from 'reactfire';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 function Chat() {
-
   const auth = useAuth();
   const firestore = useFirestore();
   const [message, setMessage] = useState('');
+  const [messageData, setMessageData] = useState([]);
+
+  useEffect(() => {
+    const q = query(collection(firestore, 'messages'), orderBy('timestamp'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = [];
+      snapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+      });
+      setMessageData(data);
+    });
+    return () => unsubscribe();
+  }, [firestore]);
 
   const handleSendMessage = async (event) => {
     event.preventDefault();
@@ -41,7 +53,30 @@ function Chat() {
         }}
       >
         <Box sx={{ flexGrow: 1, padding: '1rem', overflowY: 'auto' }}>
-          {/* Chat message display here */}
+          {messageData.map((msg) => {
+            const isCurrentUser = msg.senderID === auth.currentUser?.uid;
+            return (
+              <Box
+                key={msg.id}
+                sx={{
+                  display: 'flex',
+                  justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
+                  marginBottom: '0.5rem'
+                }}
+              >
+                <Box
+                  sx={{
+                    maxWidth: '70%',
+                    padding: '0.5rem',
+                    backgroundColor: isCurrentUser ? '#8BC34A' : '#E0E0E0',
+                    borderRadius: '1rem'
+                  }}
+                >
+                  <Box sx={{ color: isCurrentUser ? '#FFF' : '#000' }}>{msg.text}</Box>
+                </Box>
+              </Box>
+            );
+          })}
         </Box>
         <form onSubmit={handleSendMessage}>
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '1rem' }}>
@@ -70,3 +105,9 @@ function Chat() {
 }
 
 export default Chat;
+
+
+
+
+
+
