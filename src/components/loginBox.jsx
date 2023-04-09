@@ -5,13 +5,27 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'reactfire';
 import { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { Alert } from '@mui/material';
 
 function LoginBox() {
   
   const auth = useAuth()
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
+  const [showAlert, setShowAlert] = useState()
   const navigate = useNavigate()
+
+  const submit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/chat");
+    } catch (error) {
+      //console.log(error.message);
+      setShowAlert(true);
+    }
+  };
 
   return (
     <Box
@@ -29,6 +43,11 @@ function LoginBox() {
       <Typography variant="h4" gutterBottom>
         Log In
       </Typography>
+      {showAlert && (
+          <Alert severity="error">
+            Incorrect email or password
+          </Alert>
+        )}
       <form>
         <TextField
           id="email"
@@ -36,7 +55,7 @@ function LoginBox() {
           variant="filled"
           margin="normal"
           fullWidth
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {setEmail(e.target.value); setShowAlert(false)}}
           InputLabelProps={{
             style: { color: '#fff' },
           }}
@@ -51,7 +70,7 @@ function LoginBox() {
           margin="normal"
           fullWidth
           type="password"
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {setPassword(e.target.value); setShowAlert(false)}}
           InputLabelProps={{
             style: { color: '#fff' },
           }}
@@ -59,7 +78,7 @@ function LoginBox() {
             style: { color: '#fff', backgroundColor: '#444654' },
           }}
         />
-        <Button variant="contained" fullWidth sx={{backgroundColor:"#343644", marginTop: "20px"}}>
+        <Button variant="contained" fullWidth sx={{backgroundColor:"#343644", marginTop: "20px"}} onClick={submit}>
           Submit
         </Button>
         <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>

@@ -29,10 +29,10 @@ function RegisterBox() {
       try {
         if (email && password && emailRegex.test(email)) {
             await createUserWithEmailAndPassword(auth, email, password);
-            navigate('/');
+            navigate('/chat');
         }
       } catch (error) {
-        console.log(error.message);
+        //console.log(error.message);
       }
     }
   
@@ -99,7 +99,7 @@ function RegisterBox() {
             Submit
           </Button>
           <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
-            Already have an Account? <a onClick={() => {navigate('/login')}} style={{ color: '#ADD8E6', cursor: 'pointer' }}>Log in</a>
+            Already have an Account? <a onClick={() => {navigate('/')}} style={{ color: '#ADD8E6', cursor: 'pointer'}}>Log in</a>
           </Typography>
         </form>
       </Box>

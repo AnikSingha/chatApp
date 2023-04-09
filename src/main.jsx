@@ -5,6 +5,7 @@ import theme from './theme';
 import { ThemeProvider } from '@mui/material/styles';
 import { app, auth, firestore, storage } from '../firebase';
 import { FirebaseAppProvider, AuthProvider, FirestoreProvider, StorageProvider } from 'reactfire';
+import "./main.css"
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
