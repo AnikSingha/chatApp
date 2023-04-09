@@ -1,70 +1,109 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'reactfire';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { Alert } from '@mui/material';
 
 function RegisterBox() {
   
-  const auth = useAuth()
-  const [username, setUsername] = useState()
-  const [password, setPassword] = useState()
-  const navigate = useNavigate()
+    const auth = useAuth()
+    const [email, setEmail] = useState()
+    const [password, setPassword] = useState()
+    const [showPassAlert, setShowPassAlert] = useState(false)
+    const [showEmailAlert, setShowEmailAlert] = useState(false)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const navigate = useNavigate()
+  
+    const submit = async (e) => {
+      e.preventDefault()
 
-  return (
-    <Box
-      sx={{
-        backgroundColor: '#545664',
-        borderRadius: '4px',
-        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-        padding: '2rem',
-        minWidth: '300px',
-        maxWidth: '400px',
-        textAlign: 'center',
-        color: '#fff',
-      }}
-    >
-      <Typography variant="h4" gutterBottom>
-        Sign Up
-      </Typography>
-      <form>
-        <TextField
-          id="username"
-          label="Username"
-          variant="filled"
-          margin="normal"
-          fullWidth
-          onChange={(e) => setUsername(e.target.value)}
-          InputLabelProps={{
-            style: { color: '#fff' },
-          }}
-          InputProps={{
-            style: { color: '#fff', backgroundColor: '#444654' },
-          }}
-        />
-        <TextField
-          id="password"
-          label="Password"
-          variant="filled"
-          margin="normal"
-          fullWidth
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          InputLabelProps={{
-            style: { color: '#fff' },
-          }}
-          InputProps={{
-            style: { color: '#fff', backgroundColor: '#444654' },
-          }}
-        />
-        <Button variant="contained" fullWidth sx={{backgroundColor:"#343644", marginTop: "20px"}}>
-          Submit
-        </Button>
-        <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
-          Already have an Account? <a onClick={() => {navigate('/login')}} style={{ color: '#ADD8E6', cursor: 'pointer' }}>Log in</a>
+      if (password && password.length < 6 || !password) {
+        setShowPassAlert(true)
+      }
+
+      if (email && !emailRegex.test(email) || !password){
+        setShowEmailAlert(true)
+      }
+  
+      try {
+        if (email && password && emailRegex.test(email)) {
+            await createUserWithEmailAndPassword(auth, email, password);
+            navigate('/');
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  
+    return (
+      <Box
+        sx={{
+          backgroundColor: '#545664',
+          borderRadius: '15px',
+          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+          padding: '2rem',
+          minWidth: '300px',
+          maxWidth: '400px',
+          textAlign: 'center',
+          color: '#fff',
+        }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Sign Up
         </Typography>
-      </form>
-    </Box>
-  );
-}
-
-export default RegisterBox;
+        {showEmailAlert && (
+            <>
+            <Alert severity="error">
+                Invalid email entered
+            </Alert>
+            <br/>
+            </>
+        )}
+        {showPassAlert && (
+          <Alert severity="error">
+            Password must be at least 6 characters long.
+          </Alert>
+        )}
+        <form>
+          <TextField
+            id="email"
+            label="Email"
+            variant="filled"
+            margin="normal"
+            fullWidth
+            onChange={(e) => {setEmail(e.target.value); setShowEmailAlert(false)}}
+            InputLabelProps={{
+              style: { color: '#fff' },
+            }}
+            InputProps={{
+              style: { color: '#fff', backgroundColor: '#444654' },
+            }}
+          />
+          <TextField
+            id="password"
+            label="Password"
+            variant="filled"
+            margin="normal"
+            fullWidth
+            type="password"
+            onChange={(e) => {setPassword(e.target.value); setShowPassAlert(false)}}
+            InputLabelProps={{
+              style: { color: '#fff' },
+            }}
+            InputProps={{
+              style: { color: '#fff', backgroundColor: '#444654' },
+            }}
+          />
+          <Button variant="contained" fullWidth sx={{backgroundColor:"#343644", marginTop: "20px"}} onClick={submit}>
+            Submit
+          </Button>
+          <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
+            Already have an Account? <a onClick={() => {navigate('/login')}} style={{ color: '#ADD8E6', cursor: 'pointer' }}>Log in</a>
+          </Typography>
+        </form>
+      </Box>
+    );
+  }
+  
+  export default RegisterBox;

@@ -9,7 +9,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 function LoginBox() {
   
   const auth = useAuth()
-  const [username, setUsername] = useState()
+  const [email, setEmail] = useState()
   const [password, setPassword] = useState()
   const navigate = useNavigate()
 
@@ -17,7 +17,7 @@ function LoginBox() {
     <Box
       sx={{
         backgroundColor: '#545664',
-        borderRadius: '4px',
+        borderRadius: '15px',
         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
         padding: '2rem',
         minWidth: '300px',
@@ -31,12 +31,12 @@ function LoginBox() {
       </Typography>
       <form>
         <TextField
-          id="username"
-          label="Username"
+          id="email"
+          label="Email"
           variant="filled"
           margin="normal"
           fullWidth
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           InputLabelProps={{
             style: { color: '#fff' },
           }}
