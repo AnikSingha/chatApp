@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { useAuth } from "reactfire"
 import Login from "./routes/login"
 import Register from "./routes/register"
 import Chat from "./routes/chat"
-import { useAuth } from "reactfire"
-import { useEffect } from "react"
+import Profile from "./routes/profile"
 
 function App() {
 
@@ -15,6 +15,7 @@ function App() {
         <Route path="/" element={<Login/>} />
         <Route path="/register" element={<Register/>} />
         <Route path="/chat" element={<Chat/>} />
+        <Route path="/profile" element={<Profile/>} />
       </Routes>
     </BrowserRouter>
   )

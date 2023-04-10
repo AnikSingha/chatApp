@@ -1,13 +1,19 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from 'reactfire';
+import { useAuth, useFirestore, useStorage} from 'reactfire';
 import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, doc, setDoc } from 'firebase/firestore';
+import { getDownloadURL, ref } from "firebase/storage";
 import { Alert } from '@mui/material';
+
+
 
 function RegisterBox() {
   
     const auth = useAuth()
+    const firestore = useFirestore()
+    const storage = useStorage()
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
     const [showPassAlert, setShowPassAlert] = useState(false)
@@ -28,8 +34,14 @@ function RegisterBox() {
   
       try {
         if (email && password && emailRegex.test(email)) {
-            await createUserWithEmailAndPassword(auth, email, password);
-            navigate('/chat');
+          await createUserWithEmailAndPassword(auth, email, password);
+          const uid = auth.currentUser.uid;
+          const usersRef = collection(firestore, 'users')
+          const username = email.split("@")[0]
+          const defaultPfpUrl = "https://firebasestorage.googleapis.com/v0/b/chat-e9c29.appspot.com/o/default_Profile_pic.jfif?alt=media&token=3828e55c-a229-496e-9d06-b7876a96fc12"
+          const newDoc = {email: email, username: username, pfp: defaultPfpUrl}
+          await setDoc(doc(usersRef, uid), newDoc)
+          navigate('/chat');
         }
       } catch (error) {
         //console.log(error.message);
