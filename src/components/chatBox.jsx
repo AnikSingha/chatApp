@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@mui/material';
-import { useFirestore, useAuth } from 'reactfire';
-import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { useFirestore, useAuth, useStorage } from 'reactfire';
+import { collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { ref, getDownloadURL, } from 'firebase/storage';
 
 function Chat() {
   const auth = useAuth();
   const firestore = useFirestore();
+  const storage = useStorage()
   const [message, setMessage] = useState('');
   const [messageData, setMessageData] = useState([]);
+  const [userProfilePictures, setUserProfilePictures] = useState({});
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
     const q = query(collection(firestore, 'messages'), orderBy('timestamp'));
@@ -20,6 +24,32 @@ function Chat() {
     });
     return () => unsubscribe();
   }, [firestore]);
+
+  useEffect(() => {
+    const fetchProfilePictures = async () => {
+      const usersCollectionRef = collection(firestore, 'users');
+      const querySnapshot = await getDocs(usersCollectionRef);
+      const pfpPromises = [];
+      const userData = {}
+  
+      querySnapshot.forEach((doc) => {
+        userData[doc.id] = doc.data();
+        const pfpRef = ref(storage, doc.data().pfp);
+        const pfpPromise = getDownloadURL(pfpRef).then((url) => {
+          return { [doc.id]: url };
+        });
+        pfpPromises.push(pfpPromise);
+      });
+  
+      setUserData(userData)
+      const pfps = await Promise.all(pfpPromises);
+      const userProfilePictures = Object.assign({}, ...pfps);
+      setUserProfilePictures(userProfilePictures);
+      console.log(userProfilePictures);
+    };
+  
+    fetchProfilePictures();
+  }, [firestore, storage]);
 
   const handleSendMessage = async (event) => {
     event.preventDefault();
@@ -53,30 +83,60 @@ function Chat() {
         }}
       >
         <Box sx={{ flexGrow: 1, padding: '1rem', overflowY: 'auto' }}>
-          {messageData.map((msg) => {
-            const isCurrentUser = msg.senderID === auth.currentUser?.uid;
-            return (
+        {messageData.map((msg) => {
+          const isCurrentUser = msg.senderID === auth.currentUser?.uid;
+          const profilePicture = userProfilePictures[msg.senderID];
+          const username = userData[msg.senderID]?.username || "Unknown User";
+          return (
+            <Box
+              key={msg.id}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
+                marginBottom: '0.5rem',
+                alignItems: isCurrentUser ? 'flex-end' : 'flex-start'
+              }}
+            >
+              <Box sx={{ color: "#AAA", fontSize: "0.8rem" }}>{username}</Box>
               <Box
-                key={msg.id}
                 sx={{
                   display: 'flex',
-                  justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
-                  marginBottom: '0.5rem'
+                  maxWidth: '70%',
+                  padding: '0.5rem',
+                  backgroundColor: isCurrentUser ? '#8BC34A' : '#E0E0E0',
+                  borderRadius: '1rem'
                 }}
               >
-                <Box
-                  sx={{
-                    maxWidth: '70%',
-                    padding: '0.5rem',
-                    backgroundColor: isCurrentUser ? '#8BC34A' : '#E0E0E0',
-                    borderRadius: '1rem'
-                  }}
-                >
-                  <Box sx={{ color: isCurrentUser ? '#FFF' : '#000' }}>{msg.text}</Box>
-                </Box>
+                {!isCurrentUser && (
+                  <Box
+                    sx={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundImage: profilePicture ? `url(${profilePicture})` : 'none',
+                      backgroundSize: 'cover',
+                      marginRight: '0.5rem'
+                    }}
+                  />
+                )}
+                <Box sx={{ color: isCurrentUser ? '#FFF' : '#000' }}>{msg.text}</Box>
+                {isCurrentUser && (
+                  <Box
+                    sx={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundImage: profilePicture ? `url(${profilePicture})` : 'none',
+                      backgroundSize: 'cover',
+                      marginLeft: '0.5rem'
+                    }}
+                  />
+                )}
               </Box>
-            );
-          })}
+            </Box>
+          );
+        })}
         </Box>
         <form onSubmit={handleSendMessage}>
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '1rem' }}>
