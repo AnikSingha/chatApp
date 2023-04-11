@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, Avatar } from '@mui/material';
 import { useFirestore, useAuth, useStorage } from 'reactfire';
 import { collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
@@ -12,6 +12,7 @@ function Chat() {
   const [messageData, setMessageData] = useState([]);
   const [userProfilePictures, setUserProfilePictures] = useState({});
   const [userData, setUserData] = useState({});
+  const dummy = useRef();
   let prevUser = ''
 
   useEffect(() => {
@@ -22,9 +23,10 @@ function Chat() {
         data.push({ id: doc.id, ...doc.data() });
       });
       setMessageData(data);
+      dummy.current.scrollIntoView({behavior: "smooth"})
     });
     return () => unsubscribe();
-  }, [firestore]);
+  }, [firestore, dummy]);
 
   useEffect(() => {
     const fetchProfilePictures = async () => {
@@ -61,7 +63,7 @@ function Chat() {
     };
     await addDoc(messagesRef, newMessage);
     setMessage('');
-    prevUser = userData[msg.senderID]?.username
+    prevUser = userData[newMessage.senderID]?.username
   };
 
   return (
@@ -142,6 +144,7 @@ function Chat() {
           );
         })}
         </Box>
+        <div ref={dummy}></div>
         <form onSubmit={handleSendMessage}>
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '1rem' }}>
             <TextField
