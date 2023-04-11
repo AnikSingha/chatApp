@@ -23,10 +23,9 @@ function Chat() {
         data.push({ id: doc.id, ...doc.data() });
       });
       setMessageData(data);
-      dummy.current.scrollIntoView({behavior: "smooth"})
     });
     return () => unsubscribe();
-  }, [firestore, dummy]);
+  }, [firestore]);
 
   useEffect(() => {
     const fetchProfilePictures = async () => {
@@ -64,6 +63,7 @@ function Chat() {
     await addDoc(messagesRef, newMessage);
     setMessage('');
     prevUser = userData[newMessage.senderID]?.username
+    dummy.current.scrollIntoView({behavior: "smooth"});
   };
 
   return (
@@ -143,8 +143,8 @@ function Chat() {
             </Box>
           );
         })}
-        </Box>
         <div ref={dummy}></div>
+        </Box>
         <form onSubmit={handleSendMessage}>
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '1rem' }}>
             <TextField
