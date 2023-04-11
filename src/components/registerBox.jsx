@@ -40,7 +40,7 @@ function RegisterBox() {
           const defaultPfpUrl = "gs://chat-e9c29.appspot.com/default_Profile_pic.jfif"
           const newDoc = {email: email, username: username, pfp: defaultPfpUrl}
           await setDoc(doc(usersRef, uid), newDoc)
-          navigate('/chat');
+          navigate('/profile');
         }
       } catch (error) {
         //console.log(error.message);

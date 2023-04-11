@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, Avatar } from '@mui/material';
 import { useFirestore, useAuth, useStorage } from 'reactfire';
 import { collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { ref, getDownloadURL, } from 'firebase/storage';
@@ -12,6 +12,7 @@ function Chat() {
   const [messageData, setMessageData] = useState([]);
   const [userProfilePictures, setUserProfilePictures] = useState({});
   const [userData, setUserData] = useState({});
+  let prevUser = ''
 
   useEffect(() => {
     const q = query(collection(firestore, 'messages'), orderBy('timestamp'));
@@ -45,7 +46,6 @@ function Chat() {
       const pfps = await Promise.all(pfpPromises);
       const userProfilePictures = Object.assign({}, ...pfps);
       setUserProfilePictures(userProfilePictures);
-      console.log(userProfilePictures);
     };
   
     fetchProfilePictures();
@@ -61,6 +61,7 @@ function Chat() {
     };
     await addDoc(messagesRef, newMessage);
     setMessage('');
+    prevUser = userData[msg.senderID]?.username
   };
 
   return (
@@ -82,11 +83,13 @@ function Chat() {
           flexGrow: 1
         }}
       >
-        <Box sx={{ flexGrow: 1, padding: '1rem', overflowY: 'auto' }}>
+        <Box sx={{ flexGrow: 1, padding: '1rem', overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
         {messageData.map((msg) => {
           const isCurrentUser = msg.senderID === auth.currentUser?.uid;
-          const profilePicture = userProfilePictures[msg.senderID];
+          const profilePicture = userProfilePictures[msg.senderID] || null;
           const username = userData[msg.senderID]?.username || "Unknown User";
+          const shouldDisplayUsername = username !== prevUser;
+          prevUser = username
           return (
             <Box
               key={msg.id}
@@ -98,39 +101,40 @@ function Chat() {
                 alignItems: isCurrentUser ? 'flex-end' : 'flex-start'
               }}
             >
-              <Box sx={{ color: "#AAA", fontSize: "0.8rem" }}>{username}</Box>
+              {shouldDisplayUsername && <Box sx={{ color: "#AAA", fontSize: "0.8rem" }}>{username}</Box>}
               <Box
                 sx={{
                   display: 'flex',
+                  alignItems: 'flex-end',
                   maxWidth: '70%',
-                  padding: '0.5rem',
-                  backgroundColor: isCurrentUser ? '#8BC34A' : '#E0E0E0',
-                  borderRadius: '1rem'
+                  marginBottom: '0.5rem'
                 }}
               >
                 {!isCurrentUser && (
-                  <Box
-                    sx={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      backgroundImage: profilePicture ? `url(${profilePicture})` : 'none',
-                      backgroundSize: 'cover',
-                      marginRight: '0.5rem'
-                    }}
+                  <Avatar
+                    src={profilePicture}
+                    alt={username}
+                    sx={{ width: '40px', height: '40px', marginRight: '0.5rem'}}
                   />
                 )}
-                <Box sx={{ color: isCurrentUser ? '#FFF' : '#000' }}>{msg.text}</Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    maxWidth: '100%',
+                    wordWrap: 'break-word',
+                    backgroundColor: isCurrentUser ? '#E0E0E0' : '#E0E0E0',
+                    borderRadius: '1rem',
+                    padding: '0.5rem'
+                  }}
+                >
+                  <Box>{msg.text}</Box>
+                </Box>
                 {isCurrentUser && (
-                  <Box
-                    sx={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      backgroundImage: profilePicture ? `url(${profilePicture})` : 'none',
-                      backgroundSize: 'cover',
-                      marginLeft: '0.5rem'
-                    }}
+                  <Avatar
+                    src={profilePicture}
+                    alt={username}
+                    sx={{ width: '40px', height: '40px', marginLeft: '0.5rem'}}
                   />
                 )}
               </Box>

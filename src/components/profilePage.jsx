@@ -1,16 +1,39 @@
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, Avatar } from '@mui/material';
+import { useAuth, useFirestore, useStorage } from 'reactfire';
+import { useState, useEffect } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, doc, getDoc } from 'firebase/firestore';
+import { ref, getDownloadURL, } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from 'reactfire';
-import { useState } from 'react';
-import { useStorage } from 'reactfire';
 
 function ProfilePage() {
   
-    const auth = useAuth()
-    const [username, setUsername] = useState()
-    const storage = useStorage()
-    const navigate = useNavigate()
+  const auth = useAuth()
+  const uid = auth.currentUser?.uid
+  const firestore = useFirestore()
+  const storage = useStorage()
+  const [pfp, setPfp] = useState()
+  const navigate = useNavigate()
   
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const uid = user.uid;
+        try {
+          const userRef = doc(collection(firestore, 'users'), uid);
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            const pfpRef = ref(storage, userDoc.data().pfp);
+            setPfp(await getDownloadURL(pfpRef));
+          }
+        } catch (error) {
+          console.log("Error:", error);
+        }
+      }
+    });
+    return unsubscribe;
+  }, []);
+
     const submit = async() => {
 
     }
@@ -31,6 +54,11 @@ function ProfilePage() {
         <Typography variant="h4" gutterBottom>
           Your Profile
         </Typography>
+        <br/>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Avatar src={pfp} sx={{ width: 100, height: 100 }} />
+        </div>
+        <br/>
         <form>
           <TextField
             id="username"
