@@ -9,13 +9,13 @@
     "routes": [
       {
         "src": "/*",
+        "headers": {
+          "content-type": "application/javascript; charset=utf-8"
+        },
         "dest": "index.html"
       }
     ],
     "env": {
       "NODE_ENV": "production"
-    },
-    "mime": {
-      "application/javascript": ["js", "jsx"]
     }
   }
