@@ -108,7 +108,7 @@ function Chat() {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
-                marginBottom: '-0.5rem',
+                marginBottom: '-1.5rem',
                 alignItems: isCurrentUser ? 'flex-end' : 'flex-start'
               }}
             >
@@ -123,7 +123,7 @@ function Chat() {
                     marginBottom: '2px'
                   }}
                 >
-                  {username}
+                 <br/> {username}
                 </Box>
               )}
               <Box
