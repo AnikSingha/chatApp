@@ -37,6 +37,7 @@ function App() {
           path="/profile"
           element={isLoggedIn ? <Profile /> : <Navigate to="/register" replace={true} />}
         />
+        <Route path="*" element={<Navigate to="/"/>} />
       </Routes>
     </Router>
   );
