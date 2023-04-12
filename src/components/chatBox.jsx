@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, TextField, Button, Avatar } from '@mui/material';
+import { Box, TextField, Button, Avatar, Tooltip } from '@mui/material';
 import { useFirestore, useAuth, useStorage } from 'reactfire';
 import { collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { ref, getDownloadURL, } from 'firebase/storage';
+import Navbar from './navbar';
 
 function Chat() {
   const auth = useAuth();
@@ -67,7 +68,10 @@ function Chat() {
   };
 
   return (
+    <>
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Navbar/>
+      {/*
       <Box
         sx={{
           width: '250px',
@@ -76,20 +80,24 @@ function Chat() {
           borderRight: '0px solid #ccc',
         }}
       >
-        {/* Sidebar code here */}
+        { Sidebar code here }
       </Box>
+      */
+      }
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          flexGrow: 1
+          flexGrow: 1,
+          marginTop: "30px"
         }}
       >
-        <Box sx={{ flexGrow: 1, padding: '1rem', overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
+        <Box sx={{ flexGrow: 1, padding: '1rem', overflowY: 'auto', maxHeight: 'calc(100vh - 150px)' }}>
         {messageData.map((msg) => {
           const isCurrentUser = msg.senderID === auth.currentUser?.uid;
           const profilePicture = userProfilePictures[msg.senderID] || null;
           const username = userData[msg.senderID]?.username || "Unknown User";
+          const timestamp = msg.timestamp ? msg.timestamp.toDate().toLocaleString() : '';
           const shouldDisplayUsername = username !== prevUser;
           prevUser = username
           return (
@@ -99,11 +107,24 @@ function Chat() {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
-                marginBottom: '0.5rem',
+                marginBottom: '-0.5rem',
                 alignItems: isCurrentUser ? 'flex-end' : 'flex-start'
               }}
             >
-              {shouldDisplayUsername && <Box sx={{ color: "#AAA", fontSize: "0.8rem" }}>{username}</Box>}
+              {shouldDisplayUsername && (
+                <Box
+                  sx={{
+                    color: '#AAA',
+                    fontSize: '0.8rem',
+                    justifyContent: 'center',
+                    marginLeft: isCurrentUser ? '0px' : '8px',
+                    marginRight: isCurrentUser ? '12px' : '0px',
+                    marginBottom: '2px'
+                  }}
+                >
+                  {username}
+                </Box>
+              )}
               <Box
                 sx={{
                   display: 'flex',
@@ -112,33 +133,49 @@ function Chat() {
                   marginBottom: '0.5rem'
                 }}
               >
-                {!isCurrentUser && (
-                  <Avatar
-                    src={profilePicture}
-                    alt={username}
-                    sx={{ width: '40px', height: '40px', marginRight: '0.5rem'}}
-                  />
-                )}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    maxWidth: '100%',
-                    wordWrap: 'break-word',
-                    backgroundColor: isCurrentUser ? '#E0E0E0' : '#E0E0E0',
-                    borderRadius: '1rem',
-                    padding: '0.5rem'
+                <div
+                  style={{
+                    visibility: shouldDisplayUsername ? 'visible' : 'hidden',
+                    marginRight: '0.5rem'
                   }}
                 >
-                  <Box>{msg.text}</Box>
-                </Box>
-                {isCurrentUser && (
-                  <Avatar
-                    src={profilePicture}
-                    alt={username}
-                    sx={{ width: '40px', height: '40px', marginLeft: '0.5rem'}}
-                  />
-                )}
+                  {!isCurrentUser && (
+                    <Avatar
+                      src={profilePicture}
+                      alt={username}
+                      sx={{ width: '40px', height: '40px' }}
+                    />
+                  )}
+                </div>
+                <Tooltip title={timestamp} arrow>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      maxWidth: '100%',
+                      wordWrap: 'break-word',
+                      backgroundColor: isCurrentUser ? '#E0E0E0' : '#E0E0E0',
+                      borderRadius: '1rem',
+                      padding: '0.5rem'
+                    }}
+                  >
+                    <Box>{msg.text}</Box>
+                  </Box>
+                </Tooltip>
+                <div
+                  style={{
+                    visibility: shouldDisplayUsername ? 'visible' : 'hidden',
+                    marginLeft: '0.5rem'
+                  }}
+                >
+                  {isCurrentUser && (
+                    <Avatar
+                      src={profilePicture}
+                      alt={username}
+                      sx={{ width: '40px', height: '40px' }}
+                    />
+                  )}
+                </div>
               </Box>
             </Box>
           );
@@ -162,19 +199,15 @@ function Chat() {
               }}
             />
             <Box sx={{ marginLeft: '1rem' }}>
-              <Button variant="contained" type="submit">Send</Button>
+              <Button variant="contained" type="submit" sx={{backgroundColor: "#E0E0E0", color: "black"}}>Send</Button>
             </Box>
           </Box>
         </form>
       </Box>
     </Box>
+    </>
   );
 }
 
 export default Chat;
-
-
-
-
-
 

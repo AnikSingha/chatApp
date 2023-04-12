@@ -27,6 +27,7 @@ function ProfilePage() {
             if (userDoc.exists()) {
               const pfpRef = ref(storage, userDoc.data().pfp);
               setPfp(await getDownloadURL(pfpRef));
+              setUsername(userDoc.data().username)
             }
           } catch (error) {
             console.log("Error:", error);
@@ -125,7 +126,7 @@ function ProfilePage() {
             sx={{ backgroundColor: "#343644", marginTop: "20px" }}
             onClick={submit}
           >
-            Next Page
+            Chat
           </Button>
         </form>
       </Box>

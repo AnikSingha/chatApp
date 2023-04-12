@@ -84,14 +84,15 @@ function LoginBox() {
         <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
           Don't have an account? <a onClick={() => {navigate('/register')}} style={{ color: '#ADD8E6', cursor: 'pointer' }}>Sign Up</a>
         </Typography>
+        {/*
         <Typography variant="body1" gutterBottom sx={{ marginTop: '20px' }}>
-          Or sign in with
           <Box component="span" sx={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
             <FontAwesomeIcon icon={faGoogle} style={{ color: '#fff', fontSize: '2rem', margin: '0 5px' }} />
             <FontAwesomeIcon icon={faFacebook} style={{ color: '#fff', fontSize: '2rem', margin: '0 5px' }} />
             <FontAwesomeIcon icon={faTwitter} style={{ color: '#fff', fontSize: '2rem', margin: '0 5px' }} />
           </Box>
         </Typography>
+        */}
       </form>
     </Box>
   );
