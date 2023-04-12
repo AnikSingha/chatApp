@@ -101,6 +101,7 @@ function Chat() {
           const shouldDisplayUsername = username !== prevUser;
           prevUser = username
           return (
+            <>
             <Box
               key={msg.id}
               sx={{
@@ -178,6 +179,8 @@ function Chat() {
                 </div>
               </Box>
             </Box>
+            <br/>
+            </>
           );
         })}
         <div ref={dummy}></div>
