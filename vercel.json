@@ -1,21 +1,15 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "package.json",
-        "use": "@vercel/static-build"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/*",
-        "headers": {
-          "content-type": "application/javascript; charset=utf-8"
-        },
-        "dest": "index.html"
-      }
-    ],
-    "env": {
-      "NODE_ENV": "production"
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  }
+  ],
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ]
+}
